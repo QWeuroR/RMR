@@ -1,0 +1,3 @@
+[submodule "RMR"]
+	path = RMR
+	url = https://github.com/xkopp-byte/RMR.git
