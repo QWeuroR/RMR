@@ -5,6 +5,7 @@
       "includePath": [
         "${workspaceFolder}/**",
         "${workspaceFolder}/RMR/RMR",
+        "${workspaceFolder}/RMR/RMR/**",
         "${workspaceFolder}/RMR/build/Desktop_Qt_6_6_2_GCC_64bit-Debug/RMR",
         "/usr/include/qt5",
         "/usr/include/qt6/QtCore",
