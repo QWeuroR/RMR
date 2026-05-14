@@ -1,0 +1,121 @@
+
+\section{Užívateľská príručka}
+Program sa spúšťa prostredníctvom vývojového prostredia Qt a beží ako natívna aplikácia. K svojmu plnohodnotnému fungovaniu vyžaduje nadviazanie spojenia so simulátorom Kobuki (alebo s reálnym robotom), ktorý mu poskytuje potrebné dáta senzoriky a prijíma príkazy pre motory. Všetky detaily týkajúce sa prerekvizít, prvotného nastavenia projektových súborov a samotnej inštalácie sú podrobne popísané v samostatnom inštalačnom manuáli k projektu.
+
+Softvér disponuje grafickým užívateľským rozhraním určeným na zadávanie cieľov a spúšťanie vnútorných procesov robota.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1\textwidth]{img/MainWindow.png}
+    \caption{Ukážka užívateľského rozhrania}
+    \label{fig:gui}
+\end{figure}
+
+Na obrázku \ref{fig:gui} je znázornené užívateľské rozhranie programu. V strednej časti je zobrazený robot a body, ktoré sú detekované pomocou lidaru. V hornej časti sa nachádzajú pôvodné tlačidlá pre ovládanie robota (\texttt{Forward, Backward, Left, Right, Stop}) a v pravom hornom rohu sú tlačidlá Start, Use camera, Reset robot, Reset Laser. Tlačidlom Start sa spúšťa hlavný cyklus programu a pripojenie sa k IP adrese robota. Textové polia \texttt{X\_target} a \texttt{Y\_target} slúžia na zadávanie súradníc cieľa, ktorý sa načíta do poľa súradníc po stlačení tlačidla \texttt{SetXY\_no\_floodfill}, ktoré zapíše body priamo do poľa, alebo \texttt{SetXY\_floodfill}, ktoré zavolá floodfill algoritmus. Textové polia X, Y a Rot zobrazujú aktuálnu pozíciu a orientáciu robota. Obstacle signalizuje, či sa robot nachádza v móde vyhýbania sa prekážkám. Timestamp zobrazuje aktuálnu časovú vzorku. Tlačidlo \texttt{Save Map} umožňuje uložit aktuálne zmapovaný priestor do súboru. Tlačidlo \texttt{Monte Carlo} spouští lokalizační algoritmus Monte Carlo, ktorého výstup sa zobrazuje v konzole. Tlačidlo \texttt{SET\_orig} nastavuje robotu jeho aktuálu pozíciu na súradnice X a Y z textových polí pod ním.
+
+
+V súčasnosti program plne podporuje ovládanie pomocou nasledujúcich prvkov užívateľského rozhrania:
+\begin{itemize}
+    \item \textbf{Textové polia pre Zadanie X a Y súradníc (Target):} Dve textové polia určené na vpisovanie koordinát. Vstupom sú údaje v metroch ($x$ a $y$ poloha).
+    \item \textbf{Tlačidlo na odoslanie cieľa (Set Target):} Po kliknutí na toto tlačidlo (alebo podobné tlačidlo nastavenia cieľa) sa aktuálne vyplnené koordináty prečítajú a nastavia pre internú pamäť robota (funkcia \texttt{setTargetXY()}). Robot automaticky vyráta dráhu k cieľu a rozbehne sa určeným smerom. 
+    \item \textbf{Tlačidlo pre mód lokalizácie (Find Yourself):} Odštartuje beh sekvencie v samostatnom vlákne pre MonteCarlo lokalizáciu robota a dočasne prepne robota do módu domnelej prekážky, počas ktorého robot pomalšie preskúmava okolie, až kým nepotvrdí zistenie svojej vlastnej polohy.
+\end{itemize}
+
+\newpage
+\section{Fungovanie algoritmov - Úloha 1: Lokalizácia a polohovanie robota v prostredí}
+Táto sekcia popisuje funkcie pre bezkolízny priamočiary pohyb a sledovanie vlastnej polohy na základe odometrie.
+
+\subsection{Lokalizácia (updateOdometry)}
+Ide o základný stavebný kameň lokalizácie, ktorý sa stará o presné počítanie polohy $x$, $y$ a natočenia z enkodérov a gyroskopu robota. Výpočet využíva diferencie hodnôt medzi jednotlivými volaniami. 
+Enkodéry vrátia delta polohy na ľavom a pravom kolese, z ktorých je vypočítaná priemerná prejdená vzdialenosť (translácia).
+
+\subsection{Pohyb na cieľ (updateArcTrajectory pre obstacle\_detected == false)}
+Bezpečný pohyb po priestore zaručuje trajektória riadená pomocou tejto metódy, pokiaľ lidazr nezaregistroval prekážku.
+Algoritmus skontroluje vzdialenosť do cieľa prostredníctvom pomocnoých matematických funkcií:
+\begin{itemize}
+    \item \texttt{calculateAngleToTarget}: Nájde najkratší uhol medzi aktuálnou rovinou ($x\_curr, y\_curr$) a koncovým cieľom použitím arkus tangens derivátu (\texttt{atan2}).
+    \item \texttt{normalizeAngle}: Pripočítava alebo odpočítava konštantu $2\pi$, aby uhol zotrval vo formáte $(-\pi, \pi \rangle$.
+\end{itemize}
+
+O pootočenie okolo vlastnej osi za behu do daného smeru sa stará funkcia \texttt{piRegulator(error)}. Do regulátora vstupuje uhlová odchýlka (\texttt{heading\_error}) a na základe $K_p$ (Proportional) a $K_i$ (Integral) konštánt sa vracia rýchlosť natáčania s anti-windup podmienkou (ohraničenie akumulovanej chyby v integrátore). 
+
+Zároveň kvôli stabilite je volaná funkcia \texttt{applySpeedRamp(current, target, max\_speed...)}, ktorá implementuje S-krivku (zrýchľovací/spomaľovací profil polynomiálneho radu) pre elimináciu trhania robota a stabilný plynulý nábeh i dobeh k minimu na rýchlosti pohybu.
+
+\newpage
+\section{Fungovanie algoritmov - Úloha 2: Navigácia a vyhýbanie sa prekážkam}
+Ak sa robot po ceste k cieľu stretne s objektom, prechádza plynulo do módu vyhýbania a obchádzania stien. 
+
+\subsection{Lidar a prekážky (obstacleDetector a rozdelenie do segmentov)}
+Lidar vracia veľké množstvo bodových meraní v rôznych uhloch. Vzorka merania pokrýva plné okolie robota. Úlohou \texttt{obstacleDetector} je tieto body normalizovať a vyhodnotiť na základe hraničných hodnôt vzidaleností (tzv. \textit{threshold\_mm} a \textit{hysteresis\_mm}). Setuje bool hodnotu \texttt{obstacle\_detected = true}, čím signalizuje systému že nemôže pretrvávať v priamočiarom pohybe k cielu bez kolízie a mení interný stav pre výber trasy.
+
+Na optimalizáciu je 360 stupňov rozdelených na 80 sektorov (každých 4,5$^\circ$). Metóda \texttt{updateLidarSegments} v spolupráci s \texttt{rotateLidarSegmentsBySteps} v \texttt{updateOdometry} vykonáva stabilizáciu tohto mapovaného okolia - tzn. fixujú dáta napriek uhlu naklonenia robota použitím hodnôt iterácií delty z gyroskopu a rotujú kandidátske pole, takže index poľa prislúcha v určitom okamihu absolútnemu uhlu voči globálnej rovne, a nie k osi robota.
+
+\subsection{Hľadanie cesty (candidateDirection a Fitness funkcia)}
+Vo chvíli objavenia prekážky musí robot zmeniť svoj cieľový smer. Metóda \texttt{candidateDirection} prehľadáva prekážkové segmenty. Identifikuje priechodznosti kandidátskych smerov, na ktoré nasadzuje prispôsobený algoritmus ohodnotenia (Fitness).
+
+Konkrétna implementácia fitness hodnotí vhodnosť daného voľného smeru:
+\begin{center}
+    $Fitness = \mu_1 \cdot \text{finish\_distance} + \mu_2 \cdot \text{rotate\_distance} + \mu_3 \cdot \text{change\_distance}$
+\end{center}
+Kde:
+\begin{itemize}
+    \item \texttt{finish\_distance}: Vzdialenosť uhla medzi kandidátom a cieľom, kam chce robot dôjsť.
+    \item \texttt{rotate\_distance}: Potrebná fyzická výchylka robota k pootočeniu vlastnej úvahovej osi (penalizácia za drastické točky).
+    \item \texttt{change\_distance}: Vzdialenosť pri zmene ohodnoteného bodu z predošlého výpočtu. Slúži ako histeréza, aby robot stabilne držal aktuálne zvolenú stranu vyhýbania a nezmieňal prudko strany pri identickom fitness ohodnotení pravého či ľavého obchádzania (napr. stĺpa).
+\end{itemize}
+Kandidát s najnižšou cenou (Score) sa ukladá. 
+
+\subsection{Vyhýbacie manévre (updateArcTrajectory pre obstacle\_detected == true)}
+Podobne ako v prvej úlohe prechádza algoritmus na výpočet obmedzenej rýchlosti. Robot riadi \texttt{rotationspeed} opätovným využitím funkcie PI regulácie \texttt{piRegulator}, avšak tento raz chybu vyčísluje na základni uhlovej odchýlky napočítanej od víťazného \texttt{candidateDirection()}.
+
+\newpage
+\section{Úloha 3: Mapovanie}
+Mapovanie prebieha od spustenia programu a počas celého behu. Lidarové dáta sa na základe aktuálnej polohy robota a jeho orientácie transformujú do mapy. Mapa je reprezentovaná ako pole, kde 0 značí voľný priestor a 255 značí detekovaný objekt alebo stenu.
+
+\subsection{Vytváranie mapy - mapping.cpp}
+
+
+
+\subsection{Vizualizácia mapy - mapvisualizer.cpp}
+
+
+
+
+\newpage
+\section{Fungovanie algoritmov - Úloha 4: Globálna navigácia po známej mape (Floodfill)}
+Táto časť popisuje spôsob implementácie globálnej navigácie, ktorá dokáže narábať s mapou prekážok a na ktorej sa robot dokáže lokalizovať. Algoritmus floodfill poskytuje robustnejší postup na vyhýbanie sa prekážkam na mape, čím priamo nahrádza lokálnu navigáciu a slepé obchádzanie z úlohy 2 pre známe steny a bloky.
+
+\subsection{Transformácie mapy a robota}
+Základným predpokladom úspešnej dráhy je znalosť vlastnej polohy a pozície na mape. V tejto chvíli je manuálne vložená hodntoa z lokálneho súradnicového systému robota (0, 0).  Do softvéru vstupujú transformácie, ktoré umožňujú interpolovať a prepisovať reálne pozície robota a polohy jednotlivých pixelov (hodnôt v mape charakteov) mapy zobrazených cez mriežku (grid). Týmito transformáciami vieme určiť jednoznačnú pozíciu poľa a vzdialenosti prvkov.
+
+\subsection{Vytvorenie Waypointov pomocou Breadth-First Search (BFS)}
+
+Celá voľná zóna je reprezentovaná pre algoritmus ako sieť prepojených bodov v gride (t.j. hrany medzi poľami mapy nemajú rôznu dĺžku ale všetky stoja rovnako). Graf hľadá cestu naprieč mapou tak, že sa v iteratívnych prechodoch značí susedné čísla (či už steny alebo voľný priestor, aby viackát neprehľadalo ten istý pixel) na okolité susedné vrcholy, až dokým nenatrafí na character F (finish). 
+
+Výstupom tohto algoritmu sú \textit{waypointy} (určené lámaním uhlov), inak zlomové body na mape. Tie sú generované ako trasa k samotnému koncu a sú zasielané ako sústava postupných malých cieľov \texttt{x\_target} a \texttt{y\_target}. 
+
+\subsection{Sledovanie Waypointov s reflexiou neočakávaných prekážok}
+Akonáhle dostane štruktúra \texttt{robot} a jeho metódy na starosť tieto waypointy, začne ich sledovať použitím lokálneho kontroléru popísaného v Úlohe 1 (presun v móde \texttt{obstacle\_detected = false}).
+
+Robot nasleduje zadané úseky, no zároveň aktívne stráži okolie cez lidar pre prípad nečakaných prekážok. Ak sa táto prekážka obajví, robot setne \texttt{obstacle\_detected = true} a prejde do módu vyhýbania sa, pričom bude pokračovať v sledovaní aktuálneho waypointu. Po úspešnom obídení prekážky sa vráti do módu priamočiareho pohybu a bude pokračovat v ceste k waypointu, až kým nedosiahne cieľ.
+
+\newpage
+\section{Fungovanie algoritmov - Úloha 5: Monte Carlo lokalizácia (MCL)}
+V prípadoch, keď počiatočná poloha robota na mape nie je jednoznačne určená alebo po strate presnosti odometrie z dlhodobého jazdenia hrozí zablúdenie, systém pristupuje k proaktívnemu hľadaniu vlastnej globálnej polohy za pomoci Monte Carlo lokalizácie (často označovanej aj ako Particle Filter).
+
+Mechanizmus využíva samostatné asynchrónne vlákno (trieda \texttt{MonteCarlo}), ktoré simuluje možné hypotézy o polohe robota v podobe mračna "častíc" (particles). Algoritmus zbieha slučku viacerých výpočtových sub-rutín, až preým nepotvrdí zistenie svojej vlastnej polohy (\texttt{foundMyself = true}).
+
+\subsection{Inicializácia hypotéz (initParticlesGlobal)}
+Na začiatku sa po priestore voľných zón (funkcia \texttt{isFreeSpace()}), ktoré robot extrahuje z matice mapy znakov \texttt{finalMap.txt}, rozhodí špecifikovaný počet častíc (štandardne v zadaní 100). Každej iterácii častice sa vygeneruje náhodná počiatočná pozícia $x$, $y$ a náhodná rotácia $\theta$ s počiatočnou váhou $error = 0$.
+
+\subsection{Ohodnocovanie (Fitness a Transform)}
+V hlavnej slučke MCL systému sa pre každú hypotetickú časticu porovnávajú dáta namerané jej reálnym Lidarom na robote s teoretickým modelom vzdialeností načítanym z textového súboru \texttt{distanceMap.txt}.
+Častice "vrhajú" virtuálne lúče od seba von a prepočítavajú sa na mriežkový grid senzorických polí (prostredníctvom pomocno-geometrickej metódy \texttt{transform()}, ktorá zohľadňuje uhlovú posunutú orientáciu $\theta$ a normalizované pravidlá rotácie). Výsledky vzdialeností z bunky na stene penalizujú celkovú presnosť (váš \texttt{p.error}) danej častice. Ak častica vygeneruje lúč smerujúci von z mapy, obdrží výrazný penalizačný prídelok ($+200$). Celková metrika vzdialeností je zároveň uložená v častici do hodnôt \texttt{weight}.
+
+\subsection{Koleso rulety číry preber (Roulette a Cutoff)}
+Filtrovací systém ďalej re-alokuje nové generácie vzoriek cez metódu opakovaného prevzorkovania zvaného Kolo rulety (\textit{Resampling wheel, SUS}). Častica, ktorá mala obrovskú chybu (a bola odhalená ako veľmi nepravdepodobná varianta polohy) má malú šancu na sklonovanie. Menší error priamo úmerne prevyšuje pravdepodobnosť uloženia a posunutia hypotézy.
+
+Nasleduje filter \texttt{cutoff()}, ktorý brutálne orezáva hypotézy idúce cez múry s obrovským nakumulovaným errorom nad hranicu $10000.0$. Tie sú automaticky prepísané úplne nanovo skokom cez randomné znovuspustenie - rovnako ako v inicilizačnej \texttt{initParticlesGlobal()}.
+
+\subsection{Prostredie posunov (Noise a Move)}
+Pre udržanie lokálnej roznorodosti hypotéz sa pred ďalšou iteráciou nasadzuje \texttt{noise()}. Vytvára v častici jemný Gaussiansky šum na pozíciách a uhloch (zabraňuje tomu, aby sa všetky dobré hypotézy zgrupili do priam identického matematického bodu kvôli rulete preberov). V poslednom kroku metóda \texttt{move()} upravuje polohu častice posunom o časticovú rotáciu a transláciu prekopírovaným predchádzujúcim pohybom robota (\texttt{forwardspeed} na \texttt{dt} zlomky, napr. 1/40 sekundy slučiek vlákna). 
