@@ -1,22 +1,22 @@
 \babel@toc {slovak}{}\relax 
 \thispagestyle {plain}
 \contentsline {section}{\numberline {1}Užívateľská príručka}{3}{section.1}%
-\contentsline {section}{\numberline {2}Fungovanie algoritmov - Úloha 1: Lokalizácia a polohovanie robota v prostredí}{5}{section.3}%
-\contentsline {subsection}{\numberline {2.1}Lokalizácia (updateOdometry)}{5}{subsection.4}%
-\contentsline {subsection}{\numberline {2.2}Pohyb na cieľ (updateArcTrajectory pre obstacle\_detected == false)}{5}{subsection.5}%
-\contentsline {section}{\numberline {3}Fungovanie algoritmov - Úloha 2: Navigácia a vyhýbanie sa prekážkam}{6}{section.6}%
-\contentsline {subsection}{\numberline {3.1}Lidar a prekážky (obstacleDetector a rozdelenie do segmentov)}{6}{subsection.7}%
-\contentsline {subsection}{\numberline {3.2}Hľadanie cesty (candidateDirection a Fitness funkcia)}{6}{subsection.8}%
-\contentsline {subsection}{\numberline {3.3}Vyhýbacie manévre (updateArcTrajectory pre obstacle\_detected == true)}{7}{subsection.9}%
-\contentsline {section}{\numberline {4}Úloha 3: Mapovanie}{8}{section.10}%
-\contentsline {subsection}{\numberline {4.1}Vytváranie mapy - mapping.cpp}{8}{subsection.11}%
-\contentsline {subsection}{\numberline {4.2}Vizualizácia mapy - mapvisualizer.cpp}{8}{subsection.12}%
-\contentsline {section}{\numberline {5}Fungovanie algoritmov - Úloha 4: Globálna navigácia po známej mape (Floodfill)}{9}{section.13}%
-\contentsline {subsection}{\numberline {5.1}Transformácie mapy a robota}{9}{subsection.14}%
-\contentsline {subsection}{\numberline {5.2}Vytvorenie Waypointov pomocou Breadth-First Search (BFS)}{9}{subsection.15}%
-\contentsline {subsection}{\numberline {5.3}Sledovanie Waypointov s reflexiou neočakávaných prekážok}{9}{subsection.16}%
-\contentsline {section}{\numberline {6}Fungovanie algoritmov - Úloha 5: Monte Carlo lokalizácia (MCL)}{11}{section.17}%
-\contentsline {subsection}{\numberline {6.1}Inicializácia hypotéz (initParticlesGlobal)}{11}{subsection.18}%
-\contentsline {subsection}{\numberline {6.2}Ohodnocovanie (Fitness a Transform)}{11}{subsection.19}%
-\contentsline {subsection}{\numberline {6.3}Koleso rulety číry preber (Roulette a Cutoff)}{11}{subsection.20}%
-\contentsline {subsection}{\numberline {6.4}Prostredie posunov (Noise a Move)}{12}{subsection.21}%
+\contentsline {section}{\numberline {2}Úloha 1: Lokalizácia a polohovanie robota v prostredí}{5}{section.4}%
+\contentsline {subsection}{\numberline {2.1}Lokalizácia (updateOdometry)}{5}{subsection.5}%
+\contentsline {subsection}{\numberline {2.2}Pohyb smerom na cieľ}{5}{subsection.6}%
+\contentsline {section}{\numberline {3}Úloha 2: Navigácia a vyhýbanie sa prekážkam}{6}{section.7}%
+\contentsline {subsection}{\numberline {3.1}Lidar a prekážky}{6}{subsection.8}%
+\contentsline {subsection}{\numberline {3.2}Hľadanie cesty na obchádzanie prekážky}{6}{subsection.9}%
+\contentsline {subsection}{\numberline {3.3}Vyhýbacie manévre}{7}{subsection.11}%
+\contentsline {section}{\numberline {4}Úloha 3: Mapovanie}{8}{section.12}%
+\contentsline {subsection}{\numberline {4.1}Vytváranie mapy - mapping.cpp}{8}{subsection.13}%
+\contentsline {subsection}{\numberline {4.2}Vizualizácia mapy - mapvisualizer.cpp}{8}{subsection.14}%
+\contentsline {section}{\numberline {5}Úloha 4: Globálna navigácia po známej mape (Floodfill)}{9}{section.15}%
+\contentsline {subsection}{\numberline {5.1}Transformácie mapy a robota}{9}{subsection.16}%
+\contentsline {subsection}{\numberline {5.2}Vytvorenie Waypointov pomocou Breadth-First Search (BFS)}{9}{subsection.17}%
+\contentsline {subsection}{\numberline {5.3}Sledovanie Waypointov s reflexiou neočakávaných prekážok}{9}{subsection.18}%
+\contentsline {section}{\numberline {6}Úloha 5: Monte Carlo lokalizácia (MCL)}{11}{section.19}%
+\contentsline {subsection}{\numberline {6.1}Inicializácia hypotéz}{11}{subsection.20}%
+\contentsline {subsection}{\numberline {6.2}Ohodnocovanie častíc}{11}{subsection.21}%
+\contentsline {subsection}{\numberline {6.3}Ruletový výber}{11}{subsection.22}%
+\contentsline {subsection}{\numberline {6.4}Pohyb a pridávanie šumu}{12}{subsection.23}%

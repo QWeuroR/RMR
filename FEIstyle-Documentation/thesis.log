@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2026.3.6)  14 MAY 2026 23:26
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2026.3.6)  15 MAY 2026 18:40
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1349,7 +1349,7 @@ File: mt-eur.cfg 2006/07/31 v1.1 microtype config. file: AMS Euler Roman (RS)
  [2
 
 ] (./includes/core.tex
-<img/MainWindow.png, id=119, 938.50626pt x 723.70375pt>
+<img/MainWindow.png, id=117, 938.50626pt x 723.70375pt>
 File: img/MainWindow.png Graphic file (type png)
 <use img/MainWindow.png>
 Package pdftex.def Info: img/MainWindow.png  used on input line 9.
@@ -1366,63 +1366,35 @@ Package microtype Info: Loading generic protrusion settings for font family
 
 
  <./img/MainWindow.png>]
-LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 19.
- (/usr/share/texmf/tex/latex/lm/ts1lmr.fd
-File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
-) [4{/usr/share/texmf/fonts/enc/dvips/lm/lm-ts1.enc}{/usr/share/texmf/fonts/enc/dvips/lm/lm-mathit.enc}]
-Overfull \hbox (47.44144pt too wide) in paragraph at lines 32--32
-|[]\T1/lmr/bx/n/16 (-20) Pohyb na cie© (upda-te-ArcT-ra-jec-tory pre ob-stacle_detected
- []
-
-
-Overfull \hbox (47.72192pt too wide) in paragraph at lines 36--37
-[]\T1/lmtt/m/n/12 calculateAngleToTarget\T1/lmr/m/n/12 (-20) : Nájde najk-rat²í uhol me-dzi ak-tu-ál-nou ro-vi-nou ($\OML/lmm/m/it/12 x[]curr; y[]curr$\T1/lmr/m/n/12 (-20) )
- []
-
-
-Overfull \hbox (49.6515pt too wide) in paragraph at lines 40--41
-[]\T1/lmr/m/n/12 (-20) O po-oto-£e-nie okolo vlast-nej osi za behu do da-ného smeru sa stará fun-kcia \T1/lmtt/m/n/12 piRegulator(error)\T1/lmr/m/n/12 (-20) .
- []
-
-
-Overfull \hbox (53.8743pt too wide) in paragraph at lines 42--43
-[]\T1/lmr/m/n/12 (-20) Zárove¬ kvôli sta-bi-lite je vo-laná fun-kcia \T1/lmtt/m/n/12 applySpeedRamp(current, target, max_speed...)\T1/lmr/m/n/12 (-20) ,
- []
-
-[5{/usr/share/texmf/fonts/enc/dvips/lm/lm-rm.enc}{/usr/share/texmf/fonts/enc/dvips/lm/lm-mathsy.enc}]
-Overfull \hbox (7.0386pt too wide) in paragraph at lines 51--52
-\T1/lmtt/m/n/12 updateLidarSegments \T1/lmr/m/n/12 (-20) v spo-lu-práci s \T1/lmtt/m/n/12 rotateLidarSegmentsBySteps \T1/lmr/m/n/12 (-20) v \T1/lmtt/m/n/12 updateOdometry
- []
-
-
-Overfull \hbox (53.57324pt too wide) in paragraph at lines 54--55
-[]\T1/lmr/m/n/12 (-20) Vo chvíli ob-ja-ve-nia pre-káºky musí ro-bot zme-ni´ svoj cie-©ový smer. Me-tóda \T1/lmtt/m/n/12 candidateDirection
- []
-
-[6] [7] [8] [9] [10] [11]) [12] (./thesis.aux)
+<img/MapVis.png, id=127, 857.2025pt x 999.735pt>
+File: img/MapVis.png Graphic file (type png)
+<use img/MapVis.png>
+Package pdftex.def Info: img/MapVis.png  used on input line 18.
+(pdftex.def)             Requested size: 308.71106pt x 360.04161pt.
+ [4 <./img/mapVis.png>] [5{/usr/share/texmf/fonts/enc/dvips/lm/lm-mathit.enc}{/usr/share/texmf/fonts/enc/dvips/lm/lm-rm.enc}{/usr/share/texmf/fonts/enc/dvips/lm/lm-mathsy.enc}] [6] [7] [8] [9] [10] [11]) [12] (./thesis.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-01-22>
  ***********
 Package rerunfilecheck Info: File `thesis.out' has not changed.
-(rerunfilecheck)             Checksum: F3D66E6B3335A01921D5580F0E14A528;6338.
+(rerunfilecheck)             Checksum: BBB01D06252354C6DB7F0D7F565ED0EA;4538.
 Package logreq Info: Writing requests to 'thesis.run.xml'.
 \openout1 = `thesis.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 32698 strings out of 474222
- 562013 string characters out of 5748734
- 1934975 words of memory out of 5000000
- 54215 multiletter control sequences out of 15000+600000
- 631291 words of font info for 154 fonts, out of 8000000 for 9000
+ 32649 strings out of 474222
+ 561018 string characters out of 5748734
+ 1933975 words of memory out of 5000000
+ 54181 multiletter control sequences out of 15000+600000
+ 630380 words of font info for 147 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  123i,6n,131p,2379b,1994s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/share/texmf/fonts/type1/public/lm/lmbx12.pfb></usr/share/texmf/fonts/type1/public/lm/lmmi12.pfb></usr/share/texmf/fonts/type1/public/lm/lmmi8.pfb></usr/share/texmf/fonts/type1/public/lm/lmr12.pfb></usr/share/texmf/fonts/type1/public/lm/lmr8.pfb></usr/share/texmf/fonts/type1/public/lm/lmri12.pfb></usr/share/texmf/fonts/type1/public/lm/lmss12.pfb></usr/share/texmf/fonts/type1/public/lm/lmssbx10.pfb></usr/share/texmf/fonts/type1/public/lm/lmsy10.pfb></usr/share/texmf/fonts/type1/public/lm/lmsy8.pfb></usr/share/texmf/fonts/type1/public/lm/lmtt12.pfb>
-Output written on thesis.pdf (12 pages, 267856 bytes).
+Output written on thesis.pdf (12 pages, 274723 bytes).
 PDF statistics:
- 240 PDF objects out of 1000 (max. 8388607)
+ 241 PDF objects out of 1000 (max. 8388607)
  198 compressed objects within 2 object streams
- 34 named destinations out of 1000 (max. 500000)
- 43686 words of extra memory for PDF output out of 51595 (max. 10000000)
+ 36 named destinations out of 1000 (max. 500000)
+ 41643 words of extra memory for PDF output out of 42996 (max. 10000000)
 
